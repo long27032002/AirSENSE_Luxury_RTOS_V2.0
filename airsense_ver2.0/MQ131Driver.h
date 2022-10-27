@@ -10,14 +10,15 @@ void O3_init()
 {
 // MQ131.begin(2,4, LOW_CONCENTRATION, 1000000);  
 	MQ131.begin(PIN_MQ131_POWER, PIN_MQ131_SENSOR, MQ131Model::LOW_CONCENTRATION, MQ131_DEFAULT_RL);  	// khoi dong sensor  MQ131
-	Serial.println("Calibration in progress...");
+	LOG_PRINT_NOTIFICATION("Calibration in progress...");
 	MQ131.calibrate();		//Calibrate the basic values
 #ifdef	DEBUG_SERIAL
-	Serial.println("Calibration done!");
-	Serial.println("R0 = "+String(MQ131.getR0())+" Ohms");
-	Serial.println("Time to heat = "+String(MQ131.getTimeToRead())+" s");
+	LOG_PRINT_NOTIFICATION("Calibration done!");
+	LOG_PRINT_NOTIFICATION("R0 = "+String(MQ131.getR0())+" Ohms");
+	LOG_PRINT_NOTIFICATION("Time to heat = "+String(MQ131.getTimeToRead())+" s");
 #endif
 }
+
 
 
 /**
