@@ -19,7 +19,7 @@ DFRobot_OzoneSensor Ozone;
  *
  * @return  None
  */
-void O3_init()
+uint32_t O3_init(Ozone_IIAddress)
 {
 	if(!Ozone.begin(Ozone_IICAddress)) 
 	{

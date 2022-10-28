@@ -10,7 +10,11 @@
 
 uint32_t lastPressButton = 0;
 
-
+/**
+ * @brief  Kiem tra bam nut dai hay ngan
+ * 
+ * return true or flase
+*/
 bool Button_isLongPressed()
 {
 	if (millis() - lastPressButton > BUTTON_PRESS_DURATION && digitalRead(PIN_BUTTON_1) == 0) 			// kiem tra  thoi gian bam nut
