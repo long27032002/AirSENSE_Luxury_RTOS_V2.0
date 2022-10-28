@@ -12,24 +12,28 @@
 	ADDRESS_3               0x73
 */
 DFRobot_OzoneSensor Ozone;
-
+#define ERROR_NONE				0x20
+#define ERROR_DFROBOT_INIT_SUCCESS	ERROR_NONE 	
+#define ERROR_DFROBOT_INIT_FAILED  	0x21
 
 /**
  * @brief	Khoi tao module Ozone
- *
- * @return  None
+ * @param[in] Ozone_IIAddress : Khoi tao dia chi Address
+ * @return  Success or Failed
  */
 uint32_t O3_init(Ozone_IIAddress)
 {
 	if(!Ozone.begin(Ozone_IICAddress)) 
 	{
 #ifdef	DEBUG_SERIAL
-		Serial.println("I2c device number error !");
+		LOG_PRINT_NOTIFICATION("I2c device number error !");
 #endif
+		return ERROR_DFROBOT_INIT_FAILED;
 	}  else {
 #ifdef	DEBUG_SERIAL
-	Serial.println("I2c connect success !");
+		LOG_PRINT_NOTIFICATION("I2c connect success !");
 #endif
+		return ERROR_DFROBOT_INIT_SUCCESS;
 	}
 
 	Ozone.SetModes(MEASURE_MODE_PASSIVE);
