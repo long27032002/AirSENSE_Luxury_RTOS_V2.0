@@ -16,8 +16,8 @@
 void DS3231_init();
 bool DS3231_getData();
 
-void MQTT_initClient(char* _topic, char* _espID, PubSubClient& _mqttClient);
-void MQTT_postData( float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug,int pm25_min,int pm25_max);
+void mqtt_initClient(char* _topic, char* _espID, PubSubClient& _mqttClient);
+void mqtt_postData( float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug,int pm25_min,int pm25_max);
 
 bool SDcard_init();
 void SDcard_saveDataToFile(float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug ,int pm25_min, int pm25_max);
@@ -72,7 +72,7 @@ bool Button_isLongPressed();
 TaskHandle_t WIFI_SmartConfig_Handle = NULL;
 TaskHandle_t Sensors_getData_Handle = NULL;
 TaskHandle_t Screen_display_Handle = NULL;
-TaskHandle_t MQTT_sendData_Handle = NULL;
+TaskHandle_t sendData_Handle = NULL;
 TaskHandle_t SD_writeData_Handle = NULL;
 
 
@@ -88,7 +88,7 @@ void SmartConfig_Task(void * parameters)
 			while (!WiFi.smartConfigDone() && wifi_connectTrialCount_u8 < WIFI_MAX_CONNECT_TRIAL)
 			{
 				Serial.println(".");
-				TFT_wifiStatus = WIFI_Status_et::WIFI_SCANNING;			// cap nhat trang thai dang quet wifi
+				TFT_wifiStatus = WIFI_Status_et::E_WIFI_SCANNING;			// cap nhat trang thai dang quet wifi
 				myNex.writeNum("dl.wifi.val", TFT_wifiStatus);			// hien thi trang thai wifi tren man hinh
 				wifi_connectTrialCount_u8++;							// tang so lan ket noi wifi
 			}
@@ -104,11 +104,11 @@ void Wifi_checkStatus_Task(void *parameters)
 	{
 		if (WiFi.status() == wl_status_t::WL_CONNECTED)			// kiem tra tinh trang ket noi WIFI
 		{
-			TFT_wifiStatus = WIFI_Status_et::WIFI_CONNECTED;	// cap nhat trang thai WIFI
+			TFT_wifiStatus = WIFI_Status_et::E_WIFI_CONNECTED;	// cap nhat trang thai WIFI
 		}
 		else
 		{
-			TFT_wifiStatus = WIFI_Status_et::WIFI_DISCONNECT;	// cap nhat trang thai WIFI
+			TFT_wifiStatus = WIFI_Status_et::E_WIFI_DISCONNECT;	// cap nhat trang thai WIFI
 		}
 		vTaskDelay(WIFI_TASK_DELAY);
 	}
@@ -138,14 +138,14 @@ void Screen_display_Task(void *parameters)
 	}
 }
 
-void MQTT_sendData_Task(void *parameters)
+void sendData_Task(void *parameters)
 {
 	for (;;)
 	{
-		MQTT_postData(TFT_humidity_percent, TFT_temperature_C, TFT_pm1_u32, TFT_pm25_u32, TFT_pm10_u32, TFT_o3_ppb_u32, TFT_o3_ppm, TFT_o3_ug, pm25_min_u32, pm25_max_u32);
+		postData(TFT_humidity_percent, TFT_temperature_C, TFT_pm1_u32, TFT_pm25_u32, TFT_pm10_u32, TFT_o3_ppb_u32, TFT_o3_ppm, TFT_o3_ug, pm25_min_u32, pm25_max_u32);
 		mqttClient.loop();
 
-		vTaskDelay(MQTT_TASK_DELAY);
+		vTaskDelay(TASK_DELAY);
 	}
 }
 
