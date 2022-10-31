@@ -43,7 +43,7 @@ void O3_init()
  */
 void O3_getData()
 {
-	if(millis() - lastgetO3data > O3_GETDATA_PERIOD)
+	// if(millis() - lastgetO3data > O3_GETDATA_PERIOD)
 	{
 		TFT_o3_ppb_u32 = Ozone.ReadOzoneData(COLLECT_NUMBER);
 		if(min_o3_ppb > TFT_o3_ppb_u32)min_o3_ppb_u32 = TFT_o3_ppb;

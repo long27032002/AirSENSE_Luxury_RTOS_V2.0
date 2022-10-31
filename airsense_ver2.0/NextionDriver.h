@@ -178,7 +178,6 @@ void Screen_displayData()
 	
 	myNex.writeStr("dl.temc.txt"   , String(TFT_temperature_C, 1U));
 	myNex.writeStr("dl.hum.txt"    , String(TFT_humidity_percent, 1U));
-	myNex.writeStr("dl.temf.txt"   , String(TFT_temperature_F, 1U));
 
 	myNex.writeNum("dl.nppb.val"   , TFT_o3_ppb_u32);					// ghi gia tri O3 thoe don vi ppm ra man hinh 
 	myNex.writeStr("dl.sppb.txt"   , String(TFT_o3_ppb_u32, 10));		// ghi 

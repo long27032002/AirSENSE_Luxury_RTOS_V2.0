@@ -1,4 +1,4 @@
-#ifdef  _LOG_H_
+#ifndef  _LOG_H_
 #define _LOG_H_
 
 #include <stdarg.h>
@@ -16,7 +16,7 @@
 #define __DATETIME__    getDateTime("hh:mm:ss/DD/MMM/YYYY ")
 #define NAME_FILE_SAVE_LOG_MESSAGE "debug.txt"
 #define SHORT_LOG_FORMAT(letter, format) "["#letter"]" format "\r\n"
-#if USING_RTC
+#ifdef USING_RTC
 #define LOG_FORMAT(letter, format)  "[%s]["#letter"][Version:%u:%s:%u] %s(): " format "\r\n", VERSION, __DATETIME__, __FILE__, __LINE__, __FUNCTION__
 #else 
 #define LOG_FORMAT(letter, format)  "[" #letter "][%s:%u] %s(): " format "\r\n",  __FILE__, __LINE__, __FUNCTION__
@@ -54,7 +54,7 @@
 #define LOG_PRINT_ASSERT_INFOR(condition, message)  do{} while(0)
 #endif
 
-#endif
+
 
 
 /**
@@ -89,10 +89,30 @@ int writeLogMessageToFile(const char *nameFileSaveLogMessage_string, const char 
     writeFile = SD.open(nameFileSaveLogMessage_string, FILE_APPEND);    // mo the nho
     if (writeFile)                                                      // kiem tra tinh trang o the nho
     {
-        // char *message_string;
-        // vsprintf(message_string, format_string,);
-        writeFile.printf(format_string, ##__VA_ARGS__);     // ghi tin nhan ra the nho
+        static char loc_buf[64];
+        char * temp = loc_buf;
+        int len;
+        va_list arg;
+        va_list copy;
+        va_start(arg, format_string);
+        va_copy(copy, arg);
+        len = vsnprintf(NULL, 0, format_string, copy);
+        va_end(copy);
+        if(len >= sizeof(loc_buf)){
+            temp = (char*)malloc(len+1);
+            if(temp == NULL) {
+                va_end(arg);
+                return 0;
+            }
+        }
+        vsnprintf(temp, len+1, format_string, arg);
+
+        writeFile.printf("%s", temp);     // ghi tin nhan ra the nho
         writeFile.close();                                  // dong the nho
+        va_end(arg);
+        if(len >= sizeof(loc_buf)){
+            free(temp);
+        }
         return ERROR_NONE;
     } else {
         return ERROR_FILE_NOT_FOUND;        // tra ve ma loi
@@ -105,4 +125,6 @@ int writeLogMessageToFile(const char *nameFileSaveLogMessage_string, const char 
 
 }
 #endif
+
+
 

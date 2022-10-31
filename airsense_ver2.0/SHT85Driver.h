@@ -4,7 +4,7 @@
 #include "SHTSensor.h"
 #include "config.h"
 
-#define ERROR_NONE				0x00
+//#define ERROR_NONE				0x00
 #define ERROR_SHT_INIT_SUCCESS	ERROR_NONE 	
 #define ERROR_SHT_INIT_FAILED  	0x11
 #define ERROR_SHT_READ_FAILED  	0x12
@@ -16,7 +16,6 @@ SHTSensor sht(SHTSensor::SHT3X);
 
 // khai bao cac bien
 float 	 TFT_temperature_C 		= 0;
-float 	 TFT_temperature_F		= 0;
 float 	 TFT_humidity_percent 	= 0;
 
 
@@ -25,7 +24,7 @@ float 	 TFT_humidity_percent 	= 0;
  *
  * @return  uint16_t : trang thai khoi tao SHT sensor
  */
-uint16_t SHT_init()
+uint32_t SHT_init()
 {
 	if (sht.init()) 
 	{
@@ -36,7 +35,7 @@ uint16_t SHT_init()
 	} else 
 	{
 #ifdef	DEBUG_SERIAL
-		LOG_PRINT_NOTIFICATION("SHT init(): failed\n");
+		LOG_PRINT_ERROR("SHT init(): failed\n");
 #endif
 		return ERROR_SHT_READ_FAILED;			// trang thai khoi tao sensor
 	}
@@ -54,10 +53,10 @@ uint16_t SHT_init()
  * 
  * @return  uint16_t : ERROR CODE
  */
-uint16_t SHT_getData(const uint16_t temperature_calibInt_u16,
+uint32_t SHT_getData(const uint16_t temperature_calibInt_u16,
 					 const uint16_t humidity_calibInt_u16,
-					 FLOAT_32_16* 	temperature,
-					 FLOAT_32_16* 	humidity)
+					 float *temperature,
+					 float *humidity)
 {
 	float SHT_temperature;
 	float SHT_humidity;
@@ -77,15 +76,28 @@ uint16_t SHT_getData(const uint16_t temperature_calibInt_u16,
 	// kiem tra cac gia tri nhiet do do am co hop le
 	if(SHT_temperature > 0 && SHT_humidity > 0 && SHT_temperature < 100 && SHT_humidity < 100)	
 	{
-		TFT_temperature_C = SHT_temperature ;
-		TFT_humidity_percent = SHT_humidity ;
+		*temperature = SHT_temperature ;
+		*humidity 	 = SHT_humidity ;
+		return ERROR_NONE;
 	} else
 	{
-		TFT_temperature_C = 0;
-		TFT_humidity_percent = 0;     
+		*temperature = 0;
+		*humidity 	 = 0;
+		return ERROR_SHT_READ_FAILED;
 	}
-	TFT_temperature_K = TFT_temperature_C + 273;
-	return ERROR_NONE;
 }
 
 #endif
+
+
+/**
+ * TFLP01Driver
+ * SHT85Driver - chưa sửa tên hàm file này ở file .ino
+ * SDcardDriver
+ * NextionDriver
+ * MQTTConnection
+ * MQ131Driver
+ * DS3231
+ * DFRobotO3
+ * ButtonDriver
+ */

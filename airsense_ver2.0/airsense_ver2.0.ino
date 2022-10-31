@@ -26,8 +26,8 @@ void SDcard_readFile();
 //void SDcard_getData();
 void SD_runProgram();
 
-void SHT_getData();
-void SHT_init();
+uint32_t SHT_getData();
+uint32_t SHT_init();
 
 void TFLP01_getData();
 void TFLP01_init();
@@ -122,7 +122,10 @@ void Sensors_getData_Task(void *parameters)
 			O3_getData();
 		#endif
 		
-		SHT_getData();
+		SHT_getData(temperature_calibInt_u16,
+					humidity_calibInt_u16,
+					&TFT_temperature_C,
+					&TFT_humidity_percent);
 		TFLP01_getData();
 		DS3231_getData();
 		vTaskDelay(TASK_DELAY);
