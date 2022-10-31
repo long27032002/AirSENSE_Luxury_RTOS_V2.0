@@ -26,8 +26,11 @@ void SDcard_readFile();
 //void SDcard_getData();
 void SD_runProgram();
 
-void SHT_getData();
-void SHT_init();
+uint16_t SHT_getData(const uint16_t temperature_calibInt_u16,
+					 const uint16_t humidity_calibInt_u16,
+					 float* 	temperature,
+					 float* 	humidity);
+uint32_t SHT_init();
 
 void TFLP01_getData();
 void TFLP01_init();
@@ -38,10 +41,16 @@ void Screen_getCalibData();
 void Screen_displayData();
 void Screen_displayCalibData();
 
-void O3_init();
-void O3_getData();
+uint32_t O3_init(uint32_t Ozone_IIAddress);
+uint32_t O3_getData(uint32_t 	COLLECT_NUMBER,
+					uint32_t* 	o3_ppb_min_u32,
+					float* 		o3_ug_min,
+					float* 		o3_ppm_min,
+					uint32_t* 	o3_ppb_max_u32,
+					float* 		o3_ug_max,
+					float* 		o3_ppm_max  );
 
-bool Button_isLongPressed();
+uint32_t Button_isLongPressed(uint32_t* lastPressButton);
 
 
 #define LOG_PRINT_ERROR(format, ...)
