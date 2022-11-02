@@ -16,8 +16,8 @@
 void DS3231_init();
 bool DS3231_getData();
 
-void mqtt_initClient(char* _topic, char* _espID, PubSubClient& _mqttClient);
-void mqtt_postData( float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug,int pm25_min,int pm25_max);
+uint16_t mqtt_initClient(char* _topic, char* _espID, PubSubClient& _mqttClient);
+uint32_t mqtt_postData( float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug,int pm25_min,int pm25_max);
 
 bool SDcard_init();
 void SDcard_saveDataToFile(float humidity,float temperature,int pm1,int pm25,int pm10,int O3ppb,float O3ppm,float O3ug ,int pm25_min, int pm25_max);
@@ -29,8 +29,8 @@ void SD_runProgram();
 void SHT_getData();
 void SHT_init();
 
-void TFLP01_getData();
-void TFLP01_init();
+uint32_t TFLP01_getData();
+uint32_t TFLP01_init();
 
 void Screen_init();
 void Screen_saveCalibDataToSDcard();

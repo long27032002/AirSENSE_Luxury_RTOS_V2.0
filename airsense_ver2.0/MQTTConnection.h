@@ -1,9 +1,16 @@
 #pragma once
 #if (defined(USING_MQTT))
-#define ERROR_NONE					
-#define ERROR_MQTT_POST_FAILED  
-#define ERROR_WIFI_CONNECT_FAILED
-#define ERROR_MQTT_INIT_SUCCEEDED   
+#define ERROR_NONE					0x50		
+#define ERROR_MQTT_POST_FAILED  	0x51
+#define ERROR_WIFI_CONNECT_FAILED	0x52
+#define ERROR_WIFI_CONNECT_SUCCESS  0x53
+#define ERROR_MQTT_INIT_SUCCESS   0x54
+#define ERROR_MQTT_INIT_FAILED   0x55
+#define ERROR_MQTT_DATA_SEND_SUCCESS 0x56
+#define ERROR_MQTT_DATA_SEND_FAILED 0x57
+#define ERROR_MQTT_CLIENT_CONNECT_SUCCESS 0x58
+#define ERROR_MQTT_CLIENT_CONNECT_FAILED 0x59
+
 WiFiUDP ntpUDP;
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
@@ -35,7 +42,7 @@ WIFI_Status_et TFT_wifiStatus = WIFI_Status_et::E_WIFI_DISCONNECT;		// bien tran
  * @param[in]  	_mqttClient - bien luu tru ket noi
  * @return None
  */
-uint16_t MQTT_initClient(char*			 _topic,
+uint16_t mqtt_initClient(char*			 _topic,
 					 char*			 _espID,
 					 PubSubClient& 	_mqttClient)
 {
@@ -49,12 +56,21 @@ uint16_t MQTT_initClient(char*			 _topic,
 	_mqttClient.setServer(mqttServerAddress, mqttServerPort);		// cai dat server voi dia chi ip va port
 	_mqttClient.connect(_espID);									// ket noi 
 
-	LOG_PRINT_INFORMATION(\
-	_topic)
+	LOG_PRINT_INFORMATION(_topic)
 	LOG_PRINT_INFORMATION(_espID);
 	mqttClient.connect(espID);
-	LOG_PRINT_NONE("Khởi tạo client thành công")
-	return ERROR_MQTT_INIT_SUCCEEDED
+	if(PubSubClient.connect()){
+		#ifdef	DEBUG_SERIAL
+			LOG_PRINT_NOTIFICATION("MQTT initialized successfully")
+#endif
+		
+	return ERROR_MQTT_INIT_SUCCESS;
+	}else{
+		#ifdef	DEBUG_SERIAL
+			LOG_PRINT_NOTIFICATION("MQTT is not initialized ")
+#endif
+	}
+	return ERROR_MQTT_INIT_FAILED;
 }
 
 /**
@@ -71,7 +87,7 @@ uint16_t MQTT_initClient(char*			 _topic,
  * @param[in]	pm25_max_u32 - nong do pm25 max
  * @return  None
  */
-uint32_t MQTT_postData ( float 		humidity,
+uint32_t mqtt_postData ( float 		humidity,
 					 float 		temperature,
 					 uint32_t   pm1_u32,
 					 uint32_t   pm25_u32,
@@ -83,9 +99,18 @@ uint32_t MQTT_postData ( float 		humidity,
 					 uint32_t 	pm25_max_u32 )
 {
 	if (WiFi.status() == WL_CONNECTED)
-	{
+	{	
+#ifdef	DEBUG_SERIAL
+			LOG_PRINT_NOTIFICATION("wifi is connected") 
+#endif
+		return ERROR_WIFI_CONNECT_SUCCESS;
 		if (mqttClient.connected())
 		{
+#ifdef	DEBUG_SERIAL
+		LOG_PRINT_NOTIFICATION("mqtt client connected successfully");
+#endif
+		return ERROR_MQTT_CLIENT_CONNECT_SUCCESS;		
+	 
 			timeClient.update();
 			uint32_t epochTime_u32 = timeClient.getEpochTime();   	// lay thoi gian (tinh bang so giay)
 			char message[256] = {0};
@@ -105,14 +130,27 @@ uint32_t MQTT_postData ( float 		humidity,
 					pm25_max_u32,
 					epochTime_u32,
 					nameDevice );
-
+			}else{
+#ifdef	DEBUG_SERIAL
+		LOG_PRINT_NOTIFICATION("mqtt client not connected");
+#endif
+		return ERROR_MQTT_CLIENT_CONNECT_FAILED;	
+			}
 			if (mqttClient.publish(topic, message, true))	// kiem tra co gui dulieu len MQTT thanh cong
 			{
 #ifdef	DEBUG_SERIAL
 
-			LOG_PRINT_NONE("gửi dữ liệu lên MQTT thành công") 
+			LOG_PRINT_NOTIFICATION("gui du lieu len MQTT thanh cong") 
 #endif
 			}
+			return ERROR_MQTT_DATA_SEND_SUCCESS;
+			else{
+#ifdef	DEBUG_SERIAL
+			LOG_PRINT_NOTIFICATION("gui du lieu len MQTT that bai") 
+#endif
+		return ERROR_MQTT_DATA_SEND_FAILED;
+			}
+
 
 			mqttClient.loop();
 		}
@@ -121,7 +159,7 @@ uint32_t MQTT_postData ( float 		humidity,
 		{	
 			mqttClient.connect(espID);
 #ifdef	DEBUG_SERIAL
-			LOG_PRINT_NONE("mqtt reconnect");
+			LOG_PRINT_NONE("mqtt client reconnect");
 			mqttClient.subscribe("huuhuong");
 #endif
 		}
@@ -131,7 +169,5 @@ uint32_t MQTT_postData ( float 		humidity,
 	LOG_PRINT_ERROR("Wifi is not connected");
 	return ERROR_WIFI_CONNECT_FAILED
 	}
-	
 }
-
 #endif

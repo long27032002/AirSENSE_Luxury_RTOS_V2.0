@@ -3,18 +3,18 @@
 #if(defined(PIN_TX_TFLP01) && defined(PIN_RX_TFLP01))
 
 #include "config.h"
-
-#define ERROR_TFP01_INIT_SUCCESS
-#define ERROR_TFLP01_INIT_FAILED
+#define ERROR_SERIAL12_CONNECT_SUCCESS 	0x20
+#define ERROR_SERIAL12_CONNECT_FAILED	0x21
+#define ERROR_TFP01_INIT_SUCCESS		0x22
+#define ERROR_TFLP01_INIT_FAILED		0x23
+#define baudRate = 115200				
 
 // uint32_t     TFLP01_pm10sum_u32		= 0;
 // uint32_t     TFLP01_pm25sum_u32 	= 0;
 // uint32_t     TFLP01_pm1sum_u32 		= 0;
 // uint32_t	 dataTFLP01count_u32 	= 0;
 bool 	     TFLP01_readStatus_bl  	= false;
-uint32_t	 TFT_pm1_u32		   	= 0;
-uint32_t	 TFT_pm25_u32		    = 0;
-uint32_t	 TFT_pm10_u32			= 0;
+
 uint32_t	 pm25_min_u32		   	= 1000;
 uint32_t	 pm25_max_u32		   	= 0;
 float 	 TFT_temperature_C 		= 0;
@@ -48,9 +48,9 @@ uint16_t crc16_modbus(uint8_t *modbusdata , uint16_t Length)
  *
  * @return  none
  */
-uint32_t TFLP01_init()
+uint32_t TFLP01_init(baudRate)
 {
-	Serial2.begin(115200);		// khoi dong Serial2
+	Serial2.begin();		// khoi dong Serial2
 	
 	if (Serial2.available() > 0) 
 	{  
@@ -71,16 +71,22 @@ uint32_t TFLP01_init()
 
 /**
  * @brief Doc du lieu tu cam bien bui
- *
+ * 
+ *@param[out] TFT_pm1_u32
+	@param[out] TFT_pm25_u32
+	@param[out] TFT_pm10_u32
  * @return  None
  */
-unit TFLP01_getData()
-{
+uint32_t TFLP01_getData(uint32_t* TFT_pm1_u32,
+						uint32_t*  TFT_pm25_u32,
+						uint32_t*  TFT_pm10_u32)
+{	
+
 	uint8_t TFLP01_data_a8[17] = {0};
 	if (Serial2.available() > 0) 
 	{  
 		LOG_PRINT_NOTIFICATION("khoi dong Serial2 thanh cong");
-		LOG_PRINT_NOTIFICATION("Check: ")
+		LOG_PRINT_NOTIFICATION("Check: ");
 		for(uint8_t i=0; i<17; i++)
 		{
 			LOG_PRINT_INFORMATION(i) // in ra index trong mang luu du lieu TFLP01_data_a8
@@ -91,23 +97,28 @@ unit TFLP01_getData()
 		}
 		
 		TFLP01_readStatus_bl = true;
+		#ifdef	DEBUG_SERIAL
+		LOG_PRINT_NOTIFICATION("Serial2 is available");
+#endif
+		return ERROR_SERIAL12_CONNECT_SUCCESS;		
+	} 
 	} else {
 		LOG_PRINT_ERROR("Serial2 not available") 
-		return ERROR_TFP01_INIT_FAILED;
+		return ERROR_SERIAL12_CONNECT_FAILED;
 	}
 
 	// lay du lieu tam thoi (chua co datasheet)
 	if(TFLP01_readStatus_bl == true)
 	{
 		TFLP01_readStatus_bl = false;
-		TFT_pm1_u32  = TFLP01_data_a8[9]  + TFLP01_data_a8[10]*256 + pm1_calibInt_u32; // tinh gia tri bui pm1
-		TFT_pm25_u32 = TFLP01_data_a8[11] + TFLP01_data_a8[12]*256 + pm25_calibInt_u32;// tinh gia tri bui pm25
-		TFT_pm10_u32 = TFLP01_data_a8[13] + TFLP01_data_a8[14]*256 + pm10_calibInt_u32;// tinh gia tri bui pm10
+		*TFT_pm1_u32  = TFLP01_data_a8[9]  + TFLP01_data_a8[10]*256 + pm1_calibInt_u32; // tinh gia tri bui pm1
+		*TFT_pm25_u32 = TFLP01_data_a8[11] + TFLP01_data_a8[12]*256 + pm25_calibInt_u32;// tinh gia tri bui pm25
+		*TFT_pm10_u32 = TFLP01_data_a8[13] + TFLP01_data_a8[14]*256 + pm10_calibInt_u32;// tinh gia tri bui pm10
 
-		if(TFT_pm25_u32 != 255)
+		if(*TFT_pm25_u32 != 255)
 		{
-			if(pm25_max_u32 < TFT_pm25_u32) pm25_max_u32 = TFT_pm25_u32;
-			if(pm25_min_u32 > TFT_pm25_u32) pm25_min_u32 = TFT_pm25_u32;
+			if(pm25_max_u32 < *TFT_pm25_u32) pm25_max_u32 = *TFT_pm25_u32;
+			if(pm25_min_u32 > *TFT_pm25_u32) pm25_min_u32 = *TFT_pm25_u32;
 		} else{
 			LOG_PRINT_NOTIFICATION("gia tri pm24_u32 dat gia tri max la 255") 
 	
@@ -125,5 +136,4 @@ unit TFLP01_getData()
 #endif
 
 	}  
-	}
-
+	
