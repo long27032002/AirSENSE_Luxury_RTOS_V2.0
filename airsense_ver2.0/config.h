@@ -53,6 +53,7 @@
 
 #define PIN_BUTTON_1    35
 #define PIN_BUTTON_2    34
+uint32_t lastPressButton;
 
 //========================== DEFINE THIET BI ========================
 
@@ -87,8 +88,8 @@ float      max_o3_ug        = 0;
  uint32_t pm1_calibInt_u32            = 0;
  uint32_t pm10_calibInt_u32           = 0;
  uint32_t pm25_calibInt_u32           = 0;
- uint16_t temperature_calibFloat_u16 = 0;
- uint16_t humidity_calibFloat_u16     = 0;
+ float temperature_calibFloat_u16  = 0;
+ float humidity_calibFloat_u16     = 0;
 
 //=========================== Define cac chu ki =============================
 

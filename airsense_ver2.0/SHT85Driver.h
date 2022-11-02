@@ -21,7 +21,7 @@ float 	 TFT_humidity_percent 	= 0;
 
 
 /**
- * @brief	Khoi tao SHT Sensor
+ * @brief	Kiem tra khoi tao SHT Sensor
  *
  * @return  uint16_t : trang thai khoi tao SHT sensor
  */
@@ -56,8 +56,8 @@ uint32_t SHT_init()
  */
 uint16_t SHT_getData(const uint16_t temperature_calibInt_u16,
 					 const uint16_t humidity_calibInt_u16,
-					 float* 	temperature,
-					 float* 	humidity)
+					 float& 	temperature,
+					 float& 	humidity)
 {
 	float SHT_temperature;
 	float SHT_humidity;
@@ -77,8 +77,8 @@ uint16_t SHT_getData(const uint16_t temperature_calibInt_u16,
 	// kiem tra cac gia tri nhiet do do am co hop le
 	if(SHT_temperature > 0 && SHT_humidity > 0 && SHT_temperature < 100 && SHT_humidity < 100)	
 	{
-		temperature = &SHT_temperature ;
-		humidity = &SHT_humidity ;
+		temperature = SHT_temperature ;
+		humidity = SHT_humidity ;
 	} else
 	{
 		temperature = 0;

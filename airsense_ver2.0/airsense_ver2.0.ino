@@ -50,7 +50,7 @@ uint32_t O3_getData(uint32_t 	COLLECT_NUMBER,
 					float* 		o3_ug_max,
 					float* 		o3_ppm_max  );
 
-uint32_t Button_isLongPressed(uint32_t* lastPressButton);
+uint32_t Button_isLongPressed(void* parameters);
 
 
 #define LOG_PRINT_ERROR(format, ...)
@@ -90,7 +90,7 @@ void SmartConfig_Task(void * parameters)
 	// check button de smartConfig
 	for(;;)
 	{
-		if (Button_isLongPressed())
+		if (Button_isLongPressed(lastPressButton))
 		{
 			uint8_t wifi_connectTrialCount_u8 = 0;						// bien dem so lan ket noi lai WIFI
 			// ket noi lai voi wifi
@@ -131,7 +131,7 @@ void Sensors_getData_Task(void *parameters)
 			O3_getData();
 		#endif
 		
-		SHT_getData();
+		SHT_getData(temperature_calibInt_u16, humidity_calibInt_u16, temperature_calibFloat_u16, humidity_calibFloat_u16);
 		TFLP01_getData();
 		DS3231_getData();
 		vTaskDelay(TASK_DELAY);
