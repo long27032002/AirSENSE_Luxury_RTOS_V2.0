@@ -17,8 +17,8 @@ RTC_DS3231 realTime;
 /**
  * @brief	Khoi tao module thoi gian thuc
  *
- * @return  DS3231_INITSUCCESS		0x70: Khoi tao DS3231 thanh cong
- * @return  DS3231_INITUNSUCCESS	0x71: Khoi tao DS3231 khong thanh cong
+ * @return  DS3231_INIT_SUCCESS		0x70: Khoi tao DS3231 thanh cong
+ * @return  DS3231_INIT_UNSUCCESS	0x71: Khoi tao DS3231 khong thanh cong
  */
 uint32_t DS3231_init()
 {
