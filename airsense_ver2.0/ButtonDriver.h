@@ -10,7 +10,7 @@
 
 #define ERROR_NONE				    		0x90
 #define ERROR_BUTTON_LONGPRESS				0x91 	
-#define ERROR_DFROBOT_SHORTPRESS 			0x92
+#define ERROR_BUTTON_SHORTPRESS 			0x92
 
 
 /**
@@ -28,7 +28,7 @@ uint32_t Button_isLongPressed(uint32_t& lastPressButton)
 	{
 		lastPressButton = millis();				// lấy giời gian nếu bút nhấn vẫn được nhấn
 	}
-	return ERROR_DFROBOT_SHORTPRESS;
+	return ERROR_BUTTON_SHORTPRESS;
 }
 
 
